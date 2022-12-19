@@ -247,3 +247,24 @@ def update_email_id(customer_name1,email_id):
 	print('customer_name: ',customer_name1,email_id)
 
 	frappe.db.set_value('Customer',customer_name1,'email_id1',email_id)
+
+
+@frappe.whitelist()
+def fetch_dispatch_data(name):
+	so_info = frappe.db.sql(f"""
+						SELECT modified as date,name,customer,po_no
+						FROM `tabSales Order`
+						where name = '{name}'
+						""",as_dict=1)
+	print('so_info: ',so_info)
+
+	d = {}
+	if len(so_info) != 0:
+		for i in so_info:
+			d["date"] = i.date
+			d["name"] = i.name
+			d["customer"] = i.customer
+			d["po_no"] = i.po_no
+		print('d: ',d)
+	return d
+
