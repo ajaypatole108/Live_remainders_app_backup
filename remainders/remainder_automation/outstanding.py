@@ -251,20 +251,26 @@ def update_email_id(customer_name1,email_id):
 
 @frappe.whitelist()
 def fetch_dispatch_data(name):
-	so_info = frappe.db.sql(f"""
-						SELECT modified as date,name,customer,po_no
-						FROM `tabSales Order`
-						where name = '{name}'
-						""",as_dict=1)
-	print('so_info: ',so_info)
+	so_data = frappe.db.sql(f"""
+								SELECT modified as date, name, po_no, customer
+								FROM
+								 `tabSales Order`
+								WHERE
+								name = '{name}'
+							""",as_dict=1)
+	data = {}
+	if len(so_data)!=0:
+		for i in so_data:
+			data['name'] = i.name
+			data['customer'] = i.customer
 
-	d = {}
-	if len(so_info) != 0:
-		for i in so_info:
-			d["date"] = i.date
-			d["name"] = i.name
-			d["customer"] = i.customer
-			d["po_no"] = i.po_no
-		print('d: ',d)
-	return d
+			if i.po_no == None:
+				data['po_no'] = 'Not Available'
+			else:
+				data['po_no'] = i.po_no
+
+			data['date']=i.date
+
+	print(data)
+	return data
 
