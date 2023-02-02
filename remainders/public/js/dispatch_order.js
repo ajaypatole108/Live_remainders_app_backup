@@ -1,4 +1,3 @@
-
 function dispatch(data) {
     frappe.call({
         method: "remainders.remainder_automation.outstanding.fetch_dispatch_data",
@@ -11,14 +10,6 @@ function dispatch(data) {
                 let d = new frappe.ui.Dialog({
                     title: 'Enter Dispatch details',
                     fields: [
-                        {
-                            label: 'Sales Order Link',
-                            fieldname: 'link',
-                            fieldtype: 'Link',
-                            default:'https://erp.dhupargroup.com/app/sales-order/' + `${r.message.name}`,
-                            read_only:1,
-                            hidden:1
-                        },
                         {
                             label: 'Sales Order Number',
                             fieldname: 'name',
@@ -76,23 +67,54 @@ function dispatch(data) {
                             label: 'Special Instructions',
                             fieldname: 'special_instructions',
                             fieldtype: 'Data'
-                        }
+                        },
+                        {
+                            label: 'Sales Order Link',
+                            fieldname: 'link',
+                            fieldtype: 'Link',
+                            default:'https://erp.dhupargroup.com/app/sales-order/' + `${r.message.name}`,
+                            read_only:1,
+                            hidden:1
+                        },
                     ],
-                    primary_action_label: 'Send To Trello',
-                    primary_action(values) {
-                        d.hide();
+                });
+                d.set_primary_action(__("Send To Trello"), function (values){
+                    d.hide();
+                    console.log(values);
 
-                        var dispatch_order = async () => {
-                            const response = await fetch('https://n8n.dhupargroup.com/webhook/865fd238-9558-48f8-a0c6-079a33f6d8a3', {
-                              method: 'POST',
-                              body: JSON.stringify(values),
-                              headers: {
-                                "Content-Type": "application/json",
-                              }
-                            });
+                    data = {
+                        "link": values.link,
+                        "name": values.name,
+                        "customer": values.customer,
+                        "date": values.date,
+                        "po_no": values.po_no,
+                        "contact_person": values.contact_person,
+                        "transport_payment": values.transport_payment,
+                        "delivery_type": values.delivery_type,
+                        "customer_vehicle": values.customer_vehicle,
+                        "special_instructions": values.special_instructions
+                    };
+
+                    frappe.call({
+                        method: 'dhupar_group.custom_actions.send_to_trello',
+                        args:{
+                            "link": values.link,
+                            "name": values.name,
+                            "customer": values.customer,
+                            "date": values.date,
+                            "po_no": values.po_no,
+                            "contact_person": values.contact_person,
+                            "transport_payment": values.transport_payment,
+                            "delivery_type": values.delivery_type,
+                            "customer_vehicle": values.customer_vehicle,
+                            "special_instructions": values.special_instructions
+                        },
+                        callback: function(r) { 
+                            if (!r.exc) {
+                                frappe.msgprint('Dispatched')
+                            }
                         }
-                        dispatch_order();
-                    }
+                    });
                 });
                 d.show();
             }

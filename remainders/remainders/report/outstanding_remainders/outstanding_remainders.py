@@ -15,7 +15,7 @@ def execute(filters=None):
 
 def get_data(filters):
 	print(f"\n\n\n{filters}\n\n\n")
-	
+
 	condition = " 1=1 "
 	if(filters.customer):condition += f" AND customer = '{filters.customer}' "
 	print(condition)
@@ -68,7 +68,7 @@ def get_data(filters):
 
 	if len(data1) != 0:
 		for i in data1:
-			print('i',i)
+			# print('i',i)
 			doc1 = frappe.get_doc('Payment Entry',i.name)
 			i['outstanding_amount'] = -(doc1.unallocated_amount)
 			d.append(i)

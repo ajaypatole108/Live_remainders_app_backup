@@ -243,11 +243,8 @@ def send_outstanding_mail():
 				break
 
 @frappe.whitelist()
-def update_email_id(customer_name1,email_id):
-	print('customer_name: ',customer_name1,email_id)
-
-	frappe.db.set_value('Customer',customer_name1,'email_id1',email_id)
-
+def update_email_id(customer_name1,billing_email_id1):
+	frappe.db.set_value('Customer',customer_name1,'billing_email_id',billing_email_id1)
 
 @frappe.whitelist()
 def fetch_dispatch_data(name):
@@ -271,6 +268,6 @@ def fetch_dispatch_data(name):
 
 			data['date']=i.date
 
-	print(data)
+	# print(data)
 	return data
-
+	
